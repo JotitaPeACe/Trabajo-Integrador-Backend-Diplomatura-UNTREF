@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gestión de Productos</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+</head>
+<body>
+    <div class="container mt-4">
+        <h1 class="mb-4">Gestión de Productos</h1>
+
+        <div id="productsList"></div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            fetch('/products')
+                .then(response => response.json())
+                .then(products => {
+                    const productsList = document.getElementById('productsList');
+                    productsList.innerHTML = products.map(product => `
+                        <div class="card mb-3">
+                            <div class="card-body">
+                                <h5 class="card-title">${product.nombre}</h5>
+                                <p class="card-text">Precio: $<span id="precio-${product._id}">${product.precio}</span></p>
+                                <p class="card-text">Categoría: ${product.categoria}</p>
+                                <button class="btn btn-danger" onclick="deleteProduct('${product._id}')">Eliminar</button>
+                                <button class="btn btn-primary" onclick="showUpdatePriceForm('${product._id}', ${product.precio})">Ajustar Precio</button>
+                                <div id="update-price-form-${product._id}" class="mt-2" style="display: none;">
+                                    <input type="number" id="new-price-${product._id}" class="form-control mb-2" value="${product.precio}">
+                                    <button class="btn btn-success" onclick="updatePrice('${product._id}')">Guardar</button>
+                                </div>
+                            </div>
+                        </div>
+                    `).join('');
+                })
+                .catch(error => console.error('Error:', error));
+        });
+
+        function deleteProduct(productId) {
+            fetch(`/products/${productId}`, {
+                method: 'DELETE'
+            })
+            .then(response => response.json())
+            .then(data => {
+                alert(data.message);
+                location.reload();
+            })
+            .catch(error => console.error('Error:', error));
+        }
+
+        function showUpdatePriceForm(productId, currentPrice) {
+            const form = document.getElementById(`update-price-form-${productId}`);
+            form.style.display = form.style.display === 'none' ? 'block' : 'none';
+        }
+
+        function updatePrice(productId) {
+            const newPrice = document.getElementById(`new-price-${productId}`).value;
+            fetch(`/products/${productId}`, {
+                method: 'PATCH',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ precio: newPrice })
+            })
+            .then(response => response.json())
+            .then(data => {
+                alert(data.message);
+                document.getElementById(`precio-${productId}`).innerText = newPrice;
+                showUpdatePriceForm(productId, newPrice);
+            })
+            .catch(error => console.error('Error:', error));
+        }
+    </script>
+</body>
+</html>

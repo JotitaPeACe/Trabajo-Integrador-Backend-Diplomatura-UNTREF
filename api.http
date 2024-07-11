@@ -1,0 +1,36 @@
+### Ir a la pagina principal
+http://localhost:3000
+
+### Mostrar todos los productos
+GET http://localhost:3000/products
+
+### Mostrar producto por id
+GET http://localhost:3000/products/1
+
+### Mostrar producto por nombre
+GET http://localhost:3000/products/search/cama
+
+### Crear un producto
+POST http://localhost:3000/products/
+Content-Type: application/json
+
+{
+      "codigo": 31,
+      "nombre": "Mesa de pruebita",
+      "precio": 10999.99,
+      "categoria": "Oficina en casa"
+    }
+
+
+### Borrar un producto por id
+DELETE http://localhost:3000/products/31
+
+### Modificar precio de un producto
+PATCH http://localhost:3000/products/668fd980657be01ad401bc03
+content-type: application/json
+
+{
+    "precio": 9999.99
+}
+
+
